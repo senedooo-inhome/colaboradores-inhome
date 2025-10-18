@@ -1,0 +1,80 @@
+:root{
+  --bg:#f6f8f9; --card:#fff; --muted:#97a0a9; --accent:#0b66ff;
+  --green:#1fa55a; --red:#d9534f; --sidebar:#fff;
+}
+*{box-sizing:border-box}
+body,html{height:100%;margin:0;font-family:Inter,Arial,Helvetica,sans-serif;background:var(--bg);color:#233}
+.app{display:flex;min-height:100vh}
+
+.sidebar{width:260px;background:var(--sidebar);border-right:1px solid #e6eaed;padding:28px 20px}
+.brand{font-size:18px;margin:0 0 18px 0;color:#142032}
+.sidebar nav{display:flex;flex-direction:column;gap:6px}
+.nav-btn{background:transparent;border:0;text-align:left;padding:12px;border-radius:8px;cursor:pointer;color:#335;}
+.nav-btn span{margin-right:8px}
+.nav-btn.active{background:#eaf3ff;color:var(--accent);box-shadow:inset 0 0 0 1px #e1eefc}
+
+.main{flex:1;padding:20px 28px}
+
+/* topbar agora em flex para acomodar título + data */
+.topbar{
+  margin-bottom:16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+}
+.topbar h1{margin:0;font-size:20px}
+
+/* texto suave para data do dia */
+.muted{
+  color:#6b7780;
+  font-size:13px;
+  font-weight:500;
+  margin-top:4px;
+}
+
+.card{background:var(--card);border-radius:6px;padding:18px;border:1px solid #e6eaed}
+.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.search-wrap input{width:360px;padding:10px;border-radius:6px;border:1px solid #e6eaed}
+
+.table{width:100%;border-collapse:collapse}
+.table thead th{font-weight:600;color:#6b7780;text-align:left;padding:12px;border-bottom:1px solid #f0f3f5}
+.table tbody td{padding:14px;border-bottom:1px solid #f6f9fa}
+
+.btn{padding:8px 12px;border-radius:6px;border:1px solid #cfd8dc;background:white;cursor:pointer}
+.btn-green{background:var(--green);color:white;border:0}
+.btn-red{background:transparent;color:var(--red);border:1px solid #f2c6c4}
+
+.hidden{display:none !important;}  /* garante esconder mesmo que algum display seja aplicado */
+.card-body .row{display:flex;justify-content:space-between;align-items:center;padding:10px 6px}
+.status-pill{display:inline-block;padding:6px 10px;border-radius:20px;background:#e8f8ef;color:#1b7b3a;font-size:13px}
+
+/* ===== Modal com overlay separado ===== */
+#overlay{
+  position:fixed; inset:0;
+  background:rgba(0,0,0,0.25);
+  z-index:10;
+}
+
+.modal{
+  position:fixed; left:50%; top:50%;
+  transform:translate(-50%,-50%);
+  background:var(--card);
+  border-radius:8px; padding:18px; width:360px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.2);
+  z-index:20;
+}
+
+.modal-content{display:flex;flex-direction:column;gap:10px}
+.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+
+.controle-item{display:flex;justify-content:space-between;align-items:center;padding:10px;border:1px solid #eef3f6;border-radius:6px;margin-bottom:8px;background:#fff}
+.ativos-list .ativo{display:flex;justify-content:space-between;align-items:center;padding:10px;border:1px solid #efefef;border-radius:6px;margin-bottom:8px}
+
+.stat{background:#f0f7ff;padding:14px;border-radius:6px;margin-bottom:12px}
+.stat .big{font-size:28px;color:var(--accent);font-weight:700}
+
+@media(max-width:800px){
+  .sidebar{display:none}
+  .search-wrap input{width:100%}
+  .main{padding:12px}
+}

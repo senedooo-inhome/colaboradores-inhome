@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sistema de Colaboradores</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <h2 class="brand">Sistema de Colaboradores</h2>
+      <nav>
+        <button data-view="colaboradores" class="nav-btn active"><span>👥</span> Colaboradores</button>
+        <button data-view="controle" class="nav-btn"><span>🗂️</span> Controle de Logados</button>
+        <button data-view="operacao" class="nav-btn"><span>📊</span> Operação Ativa</button>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <h1 id="page-title">Colaboradores</h1>
+          <!-- Data do dia -->
+          <div id="data-hoje" class="muted"></div>
+        </div>
+      </header>
+
+      <!-- ====== TELA DE COLABORADORES ====== -->
+      <section id="colaboradores" class="view">
+        <div class="card">
+          <div class="card-header">
+            <div class="search-wrap">
+              <input id="search" placeholder="Buscar colaborador..." />
+            </div>
+            <button id="btn-add" class="btn btn-green">+ Adicionar</button>
+          </div>
+
+          <div class="card-body">
+            <table id="table" class="table">
+              <thead>
+                <tr><th>Nome</th><th>Status</th><th>Ações</th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====== TELA DE CONTROLE DE LOGADOS ====== -->
+      <section id="controle" class="view hidden">
+        <div class="card">
+          <div class="card-header">
+            <h3>Controle de Logados</h3>
+            <button id="save-status" class="btn btn-green">Salvar Status</button>
+          </div>
+          <div class="card-body" id="controle-list"></div>
+        </div>
+      </section>
+
+      <!-- ====== TELA DE OPERAÇÃO ATIVA ====== -->
+      <section id="operacao" class="view hidden">
+        <div class="card">
+          <div class="card-header">
+            <h3>Operação Ativa</h3>
+            <button id="refresh-operacao" class="btn">Atualizar</button>
+          </div>
+          <div class="card-body">
+            <div class="stat">
+              <div>Total de Logados</div>
+              <div id="total-logados" class="big">0</div>
+            </div>
+            <div id="ativos-list" class="ativos-list"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ====== OVERLAY E MODAL ====== -->
+  <div id="overlay" class="hidden"></div>
+
+  <div id="modal" class="modal hidden">
+    <div class="modal-content">
+      <h3 id="modal-title">Adicionar Colaborador</h3>
+      <input id="modal-input" placeholder="Nome do colaborador" />
+      <div class="modal-actions">
+        <button id="modal-cancel" class="btn">Cancelar</button>
+        <button id="modal-save" class="btn btn-green">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

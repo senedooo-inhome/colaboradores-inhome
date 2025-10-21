@@ -5,7 +5,8 @@ const cors = require('cors');
 const db = require('./db');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = Number(process.env.PORT) || 3000;
+const HOST = '0.0.0.0'; // importante para nuvem
 
 app.use(cors());
 app.use(express.json());
@@ -40,13 +41,10 @@ app.put('/api/collaboradores/:id', async (req, res) => {
   try {
     const id = Number(req.params.id);
     if (!Number.isFinite(id)) return res.status(400).json({ error: 'ID inválido' });
-
     const { nome } = req.body || {};
     if (!nome || !nome.trim()) return res.status(400).json({ error: 'Nome é obrigatório' });
-
     const updated = await db.update(id, nome.trim());
     if (!updated) return res.status(404).json({ error: 'Colaborador não encontrado' });
-
     res.json(updated);
   } catch (err) {
     console.error(err);
@@ -58,7 +56,6 @@ app.delete('/api/collaboradores/:id', async (req, res) => {
   try {
     const id = Number(req.params.id);
     if (!Number.isFinite(id)) return res.status(400).json({ error: 'ID inválido' });
-
     await db.remove(id);
     res.status(204).end();
   } catch (err) {
@@ -67,10 +64,9 @@ app.delete('/api/collaboradores/:id', async (req, res) => {
   }
 });
 
-// salvar status (bulk)
 app.post('/api/status', async (req, res) => {
   try {
-    const { logados } = req.body || {}; // espera array de ids
+    const { logados } = req.body || {};
     const ids = Array.isArray(logados) ? logados.map(Number).filter(Number.isFinite) : [];
     await db.bulkSet(ids);
     const total = await db.countLogados();
@@ -81,12 +77,10 @@ app.post('/api/status', async (req, res) => {
   }
 });
 
-// operações de logado individuais
 app.post('/api/logado/:id/:val', async (req, res) => {
   try {
     const id = Number(req.params.id);
     if (!Number.isFinite(id)) return res.status(400).json({ error: 'ID inválido' });
-
     const val = req.params.val === '1' || req.params.val === 'true';
     await db.setLogado(id, val);
     res.json({ success: true });
@@ -107,14 +101,13 @@ app.get('/api/ativos', async (req, res) => {
   }
 });
 
-// inicializa o banco e só então sobe o servidor
+// Sobe o servidor após init do banco
 (async () => {
   try {
     await db.init();
-    app.listen(PORT, () => console.log(`Servidor rodando em http://localhost:${PORT}`));
+    app.listen(PORT, HOST, () => console.log(`Servidor rodando na porta ${PORT}`));
   } catch (err) {
     console.error('Falha ao inicializar o banco:', err);
     process.exit(1);
   }
 })();
-

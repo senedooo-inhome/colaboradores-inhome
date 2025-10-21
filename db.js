@@ -1,17 +1,21 @@
 // db.js — inicializa banco SQLite e expõe operações (versão para 'sqlite3')
 const path = require('path');
+const fs = require('fs');
 const sqlite3 = require('sqlite3').verbose();
 
-// cria/abre o arquivo do banco na pasta do projeto
-const db = new sqlite3.Database(path.join(__dirname, 'database.sqlite'));
+// Detecta um caminho persistente (/data) quando em nuvem (Render Disk)
+const defaultLocal = path.join(__dirname, 'database.sqlite');
+const dataDirExists = fs.existsSync('/data');
+const DB_PATH = process.env.DB_PATH || (dataDirExists ? '/data/database.sqlite' : defaultLocal);
+
+const db = new sqlite3.Database(DB_PATH);
 
 // Helpers em Promise
 const run = (sql, params = []) =>
   new Promise((resolve, reject) => {
     db.run(sql, params, function (err) {
       if (err) return reject(err);
-      // 'this' tem lastID e changes
-      resolve(this);
+      resolve(this); // this.lastID, this.changes
     });
   });
 
@@ -33,6 +37,8 @@ const allP = (sql, params = []) =>
 
 // cria tabela (se não existir)
 const init = async () => {
+  // evita lock curto em I/O de plataforma
+  await run('PRAGMA busy_timeout = 3000');
   await run(`
     CREATE TABLE IF NOT EXISTS colaboradores (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -43,17 +49,11 @@ const init = async () => {
 };
 
 // consultas/crud
-const all = () =>
-  allP('SELECT * FROM colaboradores ORDER BY id DESC');
-
-const get = (id) =>
-  getP('SELECT * FROM colaboradores WHERE id = ?', [id]);
+const all = () => allP('SELECT * FROM colaboradores ORDER BY id DESC');
+const get = (id) => getP('SELECT * FROM colaboradores WHERE id = ?', [id]);
 
 const create = async (nome) => {
-  const info = await run(
-    'INSERT INTO colaboradores (nome, logado) VALUES (?, 0)',
-    [nome]
-  );
+  const info = await run('INSERT INTO colaboradores (nome, logado) VALUES (?, 0)', [nome]);
   return get(info.lastID);
 };
 
@@ -62,24 +62,18 @@ const update = async (id, nome) => {
   return get(id);
 };
 
-const remove = (id) =>
-  run('DELETE FROM colaboradores WHERE id = ?', [id]);
-
-const setLogado = (id, logado) =>
-  run('UPDATE colaboradores SET logado = ? WHERE id = ?', [logado ? 1 : 0, id]);
+const remove = (id) => run('DELETE FROM colaboradores WHERE id = ?', [id]);
+const setLogado = (id, logado) => run('UPDATE colaboradores SET logado = ? WHERE id = ?', [logado ? 1 : 0, id]);
 
 const countLogados = async () => {
   const row = await getP('SELECT COUNT(*) AS c FROM colaboradores WHERE logado = 1');
   return row?.c ?? 0;
 };
 
-const listLogados = () =>
-  allP('SELECT * FROM colaboradores WHERE logado = 1 ORDER BY id DESC');
+const listLogados = () => allP('SELECT * FROM colaboradores WHERE logado = 1 ORDER BY id DESC');
 
 const bulkSet = async (ids = []) => {
-  // zera todos
   await run('UPDATE colaboradores SET logado = 0');
-  // liga somente os informados
   for (const id of ids) {
     await run('UPDATE colaboradores SET logado = 1 WHERE id = ?', [id]);
   }
@@ -97,4 +91,3 @@ module.exports = {
   listLogados,
   bulkSet,
 };
-

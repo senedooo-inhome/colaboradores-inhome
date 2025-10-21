@@ -21,12 +21,14 @@
       <header class="topbar">
         <div>
           <h1 id="page-title">Colaboradores</h1>
-          <!-- Data do dia -->
           <div id="data-hoje" class="muted"></div>
+        </div>
+        <div class="export-group">
+          <a id="exp-logados" class="btn" href="/api/export?type=logados&format=csv">Exportar Logados (CSV)</a>
+          <a id="exp-nao" class="btn" href="/api/export?type=nao&format=csv">Exportar Não Logados (CSV)</a>
         </div>
       </header>
 
-      <!-- ====== TELA DE COLABORADORES ====== -->
       <section id="colaboradores" class="view">
         <div class="card">
           <div class="card-header">
@@ -39,7 +41,7 @@
           <div class="card-body">
             <table id="table" class="table">
               <thead>
-                <tr><th>Nome</th><th>Status</th><th>Ações</th></tr>
+                <tr><th>Nome</th><th>Status</th><th>Logado</th><th>Ações</th></tr>
               </thead>
               <tbody></tbody>
             </table>
@@ -47,7 +49,6 @@
         </div>
       </section>
 
-      <!-- ====== TELA DE CONTROLE DE LOGADOS ====== -->
       <section id="controle" class="view hidden">
         <div class="card">
           <div class="card-header">
@@ -58,7 +59,6 @@
         </div>
       </section>
 
-      <!-- ====== TELA DE OPERAÇÃO ATIVA ====== -->
       <section id="operacao" class="view hidden">
         <div class="card">
           <div class="card-header">
@@ -77,13 +77,17 @@
     </main>
   </div>
 
-  <!-- ====== OVERLAY E MODAL ====== -->
+  <!-- overlay e modal -->
   <div id="overlay" class="hidden"></div>
-
   <div id="modal" class="modal hidden">
     <div class="modal-content">
       <h3 id="modal-title">Adicionar Colaborador</h3>
       <input id="modal-input" placeholder="Nome do colaborador" />
+      <select id="modal-status">
+        <option value="ativo">Ativo</option>
+        <option value="ferias">Férias</option>
+        <option value="atestado">Atestado</option>
+      </select>
       <div class="modal-actions">
         <button id="modal-cancel" class="btn">Cancelar</button>
         <button id="modal-save" class="btn btn-green">Salvar</button>

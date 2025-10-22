@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const cors = require('cors');
 const db = require('./db');
+const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
@@ -11,20 +12,30 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Reset diário
-async function resetIfNewDay() {
-  const today = new Date().toISOString().slice(0, 10);
-  const last = await db.getMeta('last_reset');
-  if (last !== today) {
-    await db.bulkSet([]);
-    await db.setMeta('last_reset', today);
-    console.log('[RESET] Logins zerados para a data', today);
-  }
-}
-setInterval(resetIfNewDay, 60 * 1000);
+// 🔐 Supabase Auth
+const supabase = createClient(
+  'https://ucgydfcwqazijkvcxreu.supabase.co',
+  'sb_publishable_hLlZUMLwhC5nrbUelTA0jA_abl9qyi2'
+);
 
-// API
-app.get('/api/collaboradores', async (req, res) => {
+const requireAuth = async (req, res, next) => {
+  const token = req.headers.authorization?.replace('Bearer ', '');
+  if (!token) return res.status(401).json({ error: 'Token ausente' });
+
+  try {
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+    if (error || !user) return res.status(401).json({ error: 'Token inválido' });
+
+    req.user = user;
+    next();
+  } catch (err) {
+    console.error('Erro na autenticação:', err);
+    res.status(401).json({ error: 'Falha na verificação do token' });
+  }
+};
+
+// 🔐 Rota protegida
+app.get('/api/collaboradores', requireAuth, async (req, res) => {
   try {
     const q = (req.query.q || '').toLowerCase();
     const list = await db.all();
@@ -36,6 +47,7 @@ app.get('/api/collaboradores', async (req, res) => {
   }
 });
 
+// 🔓 Rotas públicas (você pode proteger mais se quiser)
 app.post('/api/collaboradores', async (req, res) => {
   try {
     const { nome, status } = req.body || {};
@@ -146,7 +158,6 @@ app.get('/api/export', async (req, res) => {
 (async () => {
   try {
     await db.init();
-    await resetIfNewDay();
     app.listen(PORT, HOST, () => console.log(`Servidor rodando na porta ${PORT}`));
   } catch (err) {
     console.error('Falha ao inicializar o banco:', err);

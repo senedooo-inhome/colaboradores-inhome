@@ -69,9 +69,9 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script>
-    const supabase = supabase.createClient(
-      'https://ucgydfcwqazjjkvxcreu.supabase.co',
-      'sb_pub_bTshaleLhL7a0mRcu0nebr1TAPy_aLs0yz12'
+    const supabase = window.supabase.createClient(
+      'https://ucgydfcwqazijkvcxreu.supabase.co',
+      'sb_publishable_hLlZUMLwhC5nrbUelTA0jA_abl9qyi2'
     );
 
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
@@ -85,7 +85,7 @@
         document.getElementById('error').textContent = 'Email ou senha inválidos.';
       } else {
         localStorage.setItem('token', data.session.access_token);
-        window.location.href = '/'; // redireciona para o app principal
+        window.location.href = '/';
       }
     });
   </script>

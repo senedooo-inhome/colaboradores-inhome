@@ -13,20 +13,30 @@
   </script>
 </head>
 <body>
+  <!-- Barra superior com nome e logo -->
+  <header class="topbar">
+    <div class="logo-container">
+      <h1 class="system-title">Sistema de Colaboradores</h1>
+      <img src="logo-sonax.png" alt="Sonax In Home" class="logo-img" />
+    </div>
+  </header>
+
   <div class="app">
+    <!-- Menu lateral estilizado -->
     <aside class="sidebar">
-      <h2 class="brand">Sistema de Colaboradores</h2>
       <nav>
-        <button data-view="colaboradores" class="nav-btn active"><span>👥</span> Colaboradores</button>
-        <button data-view="controle" class="nav-btn"><span>🗂️</span> Controle de Logados</button>
-        <button data-view="operacao" class="nav-btn"><span>📊</span> Operação Ativa</button>
+        <ul class="menu">
+          <li data-view="colaboradores" class="nav-btn active"><span>👥</span> Colaboradores</li>
+          <li data-view="controle" class="nav-btn"><span>🗂️</span> Controle de Logados</li>
+          <li data-view="operacao" class="nav-btn"><span>📊</span> Operação Ativa</li>
+        </ul>
       </nav>
     </aside>
 
     <main class="main">
-      <header class="topbar">
+      <header class="subtopbar">
         <div>
-          <h1 id="page-title">Colaboradores</h1>
+          <h2 id="page-title">Colaboradores</h2>
           <div id="data-hoje" class="muted"></div>
         </div>
         <div class="export-group">
@@ -35,6 +45,7 @@
         </div>
       </header>
 
+      <!-- Seções do sistema -->
       <section id="colaboradores" class="view">
         <div class="card">
           <div class="card-header">
@@ -43,7 +54,6 @@
             </div>
             <button id="btn-add" class="btn btn-green">+ Adicionar</button>
           </div>
-
           <div class="card-body">
             <table id="table" class="table">
               <thead>
@@ -81,6 +91,11 @@
         </div>
       </section>
     </main>
+  </div>
+
+  <!-- Assistente no rodapé -->
+  <div class="assistente">
+    <img src="assistente-sonax.png" alt="Assistente Sonax" />
   </div>
 
   <!-- overlay e modal -->

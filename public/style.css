@@ -117,7 +117,18 @@ body,html{height:100%;margin:0;font-family:Inter,Arial,Helvetica,sans-serif;back
   color:#8a0032;
   border-color:#ffc1cd;
 }
-
+.badge-folga {
+  background-color: #cce5ff;
+  color: #004085;
+}
+.badge-compensacao {
+  background-color: #e2e3e5;
+  color: #383d41;
+}
+.badge-afastado {
+  background-color: #f8d7da;
+  color: #721c24;
+}
 /* ======= NOVO: select do modal ======= */
 .modal-content select{
   padding:10px;

@@ -93,10 +93,16 @@ searchInput.addEventListener('input', () => {
 });
 
 function badgeStatus(s) {
-  const map = { ativo: 'badge-ativo', ferias: 'badge-ferias', atestado: 'badge-atestado' };
+  const map = {
+    'Ativo': 'badge-ativo',
+    'Férias': 'badge-ferias',
+    'Atestado': 'badge-atestado',
+    'Folga': 'badge-folga',
+    'Folga compensação': 'badge-compensacao',
+    'Afastado': 'badge-afastado'
+  };
   const cls = map[s] || 'badge-ativo';
-  const label = s === 'ferias' ? 'Férias' : s === 'atestado' ? 'Atestado' : 'Ativo';
-  return `<span class="badge ${cls}">${label}</span>`;
+  return `<span class="badge ${cls}">${s}</span>`;
 }
 
 async function loadList() {

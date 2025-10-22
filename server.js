@@ -11,16 +11,6 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ✅ Lista de status permitidos
-const STATUS_VALIDOS = [
-  'Ativo',
-  'Férias',
-  'Atestado',
-  'Folga',
-  'Folga compensação',
-  'Afastado'
-];
-
 // Reset diário
 async function resetIfNewDay() {
   const today = new Date().toISOString().slice(0, 10);
@@ -50,14 +40,7 @@ app.post('/api/collaboradores', async (req, res) => {
   try {
     const { nome, status } = req.body || {};
     if (!nome || !nome.trim()) return res.status(400).json({ error: 'Nome é obrigatório' });
-
-    const normalizado = (status || '').trim().toLowerCase();
-    const statusValido = STATUS_VALIDOS.find(s => s.toLowerCase() === normalizado);
-    if (status && !statusValido) {
-      return res.status(400).json({ error: 'Status inválido' });
-    }
-
-    const novo = await db.create(nome.trim(), statusValido || 'Ativo');
+    const novo = await db.create(nome.trim(), status || 'ativo');
     res.status(201).json(novo);
   } catch (err) {
     console.error(err);
@@ -73,13 +56,7 @@ app.put('/api/collaboradores/:id', async (req, res) => {
     const { nome, status } = req.body || {};
     if (!nome || !nome.trim()) return res.status(400).json({ error: 'Nome é obrigatório' });
 
-    const normalizado = (status || '').trim().toLowerCase();
-    const statusValido = STATUS_VALIDOS.find(s => s.toLowerCase() === normalizado);
-    if (status && !statusValido) {
-      return res.status(400).json({ error: 'Status inválido' });
-    }
-
-    const updated = await db.update(id, nome.trim(), statusValido || 'Ativo');
+    const updated = await db.update(id, nome.trim(), status || 'ativo');
     if (!updated) return res.status(404).json({ error: 'Colaborador não encontrado' });
 
     res.json(updated);

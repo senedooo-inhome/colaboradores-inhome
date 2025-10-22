@@ -1,7 +1,15 @@
 // app.js - frontend
-const api = (path, opts) =>
-  fetch(path, { headers: { 'Content-Type': 'application/json' }, ...opts })
-    .then(r => r.json().catch(() => {}));
+const token = localStorage.getItem('token');
+
+const api = (path, opts = {}) =>
+  fetch(path, {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    ...opts
+  })
+  .then(r => r.json().catch(() => null));
 
 const views = document.querySelectorAll('.view');
 const navBtns = document.querySelectorAll('.nav-btn');

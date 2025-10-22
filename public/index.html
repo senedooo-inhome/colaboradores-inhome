@@ -1,7 +1,3 @@
-const token = localStorage.getItem('token');
-if (!token) {
-  window.location.href = '/login.html';
-}
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -9,6 +5,12 @@ if (!token) {
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Sistema de Colaboradores</title>
   <link rel="stylesheet" href="style.css" />
+  <script>
+    const token = localStorage.getItem('token');
+    if (!token) {
+      window.location.href = '/login.html';
+    }
+  </script>
 </head>
 <body>
   <div class="app">
@@ -88,13 +90,13 @@ if (!token) {
       <h3 id="modal-title">Adicionar Colaborador</h3>
       <input id="modal-input" placeholder="Nome do colaborador" />
       <select id="modal-status">
-  <option value="Ativo">Ativo</option>
-  <option value="Férias">Férias</option>
-  <option value="Atestado">Atestado</option>
-  <option value="Folga">Folga</option>
-  <option value="Folga compensação">Folga compensação</option>
-  <option value="Afastado">Afastado</option>
-</select>
+        <option value="Ativo">Ativo</option>
+        <option value="Férias">Férias</option>
+        <option value="Atestado">Atestado</option>
+        <option value="Folga">Folga</option>
+        <option value="Folga compensação">Folga compensação</option>
+        <option value="Afastado">Afastado</option>
+      </select>
       <div class="modal-actions">
         <button id="modal-cancel" class="btn">Cancelar</button>
         <button id="modal-save" class="btn btn-green">Salvar</button>

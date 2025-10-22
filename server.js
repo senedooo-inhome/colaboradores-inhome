@@ -1,4 +1,3 @@
-// server.js
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
@@ -12,22 +11,29 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-/* ----------------- Reset diário -----------------
-   Guardamos a data do último reset na tabela meta.
-   A cada minuto, se mudou o dia, zeramos "logado".
---------------------------------------------------*/
+// ✅ Lista de status permitidos
+const STATUS_VALIDOS = [
+  'Ativo',
+  'Férias',
+  'Atestado',
+  'Folga',
+  'Folga compensação',
+  'Afastado'
+];
+
+// Reset diário
 async function resetIfNewDay() {
-  const today = new Date().toISOString().slice(0, 10); // AAAA-MM-DD (UTC)
+  const today = new Date().toISOString().slice(0, 10);
   const last = await db.getMeta('last_reset');
   if (last !== today) {
-    await db.bulkSet([]);                  // zera todos
-    await db.setMeta('last_reset', today); // grava a data de hoje
+    await db.bulkSet([]);
+    await db.setMeta('last_reset', today);
     console.log('[RESET] Logins zerados para a data', today);
   }
 }
-setInterval(resetIfNewDay, 60 * 1000); // checa a cada 1 min
+setInterval(resetIfNewDay, 60 * 1000);
 
-// ------------ API ------------
+// API
 app.get('/api/collaboradores', async (req, res) => {
   try {
     const q = (req.query.q || '').toLowerCase();
@@ -44,7 +50,10 @@ app.post('/api/collaboradores', async (req, res) => {
   try {
     const { nome, status } = req.body || {};
     if (!nome || !nome.trim()) return res.status(400).json({ error: 'Nome é obrigatório' });
-    const novo = await db.create(nome.trim(), status || 'ativo');
+    if (status && !STATUS_VALIDOS.includes(status)) {
+      return res.status(400).json({ error: 'Status inválido' });
+    }
+    const novo = await db.create(nome.trim(), status || 'Ativo');
     res.status(201).json(novo);
   } catch (err) {
     console.error(err);
@@ -59,8 +68,11 @@ app.put('/api/collaboradores/:id', async (req, res) => {
 
     const { nome, status } = req.body || {};
     if (!nome || !nome.trim()) return res.status(400).json({ error: 'Nome é obrigatório' });
+    if (status && !STATUS_VALIDOS.includes(status)) {
+      return res.status(400).json({ error: 'Status inválido' });
+    }
 
-    const updated = await db.update(id, nome.trim(), status || 'ativo');
+    const updated = await db.update(id, nome.trim(), status || 'Ativo');
     if (!updated) return res.status(404).json({ error: 'Colaborador não encontrado' });
 
     res.json(updated);
@@ -82,7 +94,6 @@ app.delete('/api/collaboradores/:id', async (req, res) => {
   }
 });
 
-// salvar status (bulk)
 app.post('/api/status', async (req, res) => {
   try {
     const { logados } = req.body || {};
@@ -96,7 +107,6 @@ app.post('/api/status', async (req, res) => {
   }
 });
 
-// operações de logado individuais
 app.post('/api/logado/:id/:val', async (req, res) => {
   try {
     const id = Number(req.params.id);
@@ -121,18 +131,16 @@ app.get('/api/ativos', async (req, res) => {
   }
 });
 
-/* --------- Exportação (CSV/JSON) ----------
-   /api/export?type=logados|nao&format=csv|json
---------------------------------------------*/
 function toCSV(rows) {
   const header = ['id', 'nome', 'status', 'logado'];
   const escape = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
   return [header.join(','), ...rows.map(r => header.map(h => escape(r[h])).join(','))].join('\n');
 }
+
 app.get('/api/export', async (req, res) => {
   try {
-    const type = (req.query.type || 'logados').toLowerCase(); // logados | nao
-    const format = (req.query.format || 'csv').toLowerCase(); // csv | json
+    const type = (req.query.type || 'logados').toLowerCase();
+    const format = (req.query.format || 'csv').toLowerCase();
     const all = await db.all();
     const rows = type === 'nao' ? all.filter(r => !r.logado) : all.filter(r => !!r.logado);
 
@@ -140,7 +148,7 @@ app.get('/api/export', async (req, res) => {
       res.setHeader('Content-Disposition', `attachment; filename="${type}-logados.json"`);
       return res.json(rows);
     }
-    // CSV
+
     const csv = toCSV(rows);
     res.setHeader('Content-Type', 'text/csv; charset=utf-8');
     res.setHeader('Content-Disposition', `attachment; filename="${type}-logados.csv"`);
@@ -151,11 +159,10 @@ app.get('/api/export', async (req, res) => {
   }
 });
 
-// inicializa banco e sobe servidor
 (async () => {
   try {
     await db.init();
-    await resetIfNewDay(); // garante reset na subida
+    await resetIfNewDay();
     app.listen(PORT, HOST, () => console.log(`Servidor rodando na porta ${PORT}`));
   } catch (err) {
     console.error('Falha ao inicializar o banco:', err);

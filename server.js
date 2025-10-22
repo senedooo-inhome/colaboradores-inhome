@@ -50,10 +50,14 @@ app.post('/api/collaboradores', async (req, res) => {
   try {
     const { nome, status } = req.body || {};
     if (!nome || !nome.trim()) return res.status(400).json({ error: 'Nome é obrigatório' });
-    if (status && !STATUS_VALIDOS.includes(status)) {
+
+    const normalizado = (status || '').trim().toLowerCase();
+    const statusValido = STATUS_VALIDOS.find(s => s.toLowerCase() === normalizado);
+    if (status && !statusValido) {
       return res.status(400).json({ error: 'Status inválido' });
     }
-    const novo = await db.create(nome.trim(), status || 'Ativo');
+
+    const novo = await db.create(nome.trim(), statusValido || 'Ativo');
     res.status(201).json(novo);
   } catch (err) {
     console.error(err);
@@ -68,11 +72,14 @@ app.put('/api/collaboradores/:id', async (req, res) => {
 
     const { nome, status } = req.body || {};
     if (!nome || !nome.trim()) return res.status(400).json({ error: 'Nome é obrigatório' });
-    if (status && !STATUS_VALIDOS.includes(status)) {
+
+    const normalizado = (status || '').trim().toLowerCase();
+    const statusValido = STATUS_VALIDOS.find(s => s.toLowerCase() === normalizado);
+    if (status && !statusValido) {
       return res.status(400).json({ error: 'Status inválido' });
     }
 
-    const updated = await db.update(id, nome.trim(), status || 'Ativo');
+    const updated = await db.update(id, nome.trim(), statusValido || 'Ativo');
     if (!updated) return res.status(404).json({ error: 'Colaborador não encontrado' });
 
     res.json(updated);
